@@ -19,24 +19,24 @@ export default function PostForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 border p-4 rounded">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded border p-4">
       <h2 className="text-lg font-semibold">新しい記事を投稿</h2>
       <input
         type="text"
         value={title}
         placeholder="タイトル"
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
       />
       <textarea
         placeholder="本文"
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
       />
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="rounded bg-blue-500 px-4 py-2 text-white"
       >
         追加
       </button>
