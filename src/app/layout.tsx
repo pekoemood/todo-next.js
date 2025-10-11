@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navi from "./components/Navi/Navi";
 
 export const metadata: Metadata = {
   title: "SHIO PROJECT",
@@ -13,8 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>
-        <main>{children}</main>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+        <div className="flex h-full flex-col">
+          <Navi />
+          <main>{children}</main>
+        </div>
       </body>
     </html>
   );
