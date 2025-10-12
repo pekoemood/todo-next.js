@@ -14,11 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
-        <div className="flex h-full flex-col">
-          <Navi />
-          <main>{children}</main>
-        </div>
+      <body className="flex min-h-screen flex-col bg-gray-50 text-gray-900 antialiased">
+        <Navi />
+        <main className="flex flex-grow">{children}</main>
       </body>
     </html>
   );
