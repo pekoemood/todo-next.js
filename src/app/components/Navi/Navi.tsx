@@ -1,13 +1,28 @@
+"use client";
+
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/20/solid";
+import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navi() {
+  const pathname = usePathname();
+
+  const getNavLinkClasses = (path: string) => {
+    const isActive = path === pathname;
+    return clsx("flex items-center border-b-2", {
+      "border-indigo-600 px-1 pt-1 text-sm font-medium text-gray-900": isActive,
+      "border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700":
+        !isActive,
+    });
+  };
+
   return (
     <Disclosure as="nav" className="relative bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -36,22 +51,13 @@ export default function Navi() {
               />
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                href={"/"}
-                className="flex items-center border-b-2 border-indigo-600 px-1 pt-1 text-sm font-medium text-gray-900"
-              >
+              <Link href={"/"} className={getNavLinkClasses("/")}>
                 Top
               </Link>
-              <Link
-                href={"/pokemon"}
-                className="flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              >
+              <Link href={"/pokemon"} className={getNavLinkClasses("/pokemon")}>
                 Pokemon
               </Link>
-              <Link
-                href={"/posts/1"}
-                className="flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              >
+              <Link href={"/posts/1"} className={getNavLinkClasses("/posts/1")}>
                 Posts
               </Link>
             </div>
