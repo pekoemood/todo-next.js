@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className="flex min-h-screen flex-col bg-gray-50 text-gray-900 antialiased">
         <Navi />
-        <main className="flex flex-grow">{children}</main>
+        <main className="flex-grow">{children}</main>
       </body>
     </html>
   );

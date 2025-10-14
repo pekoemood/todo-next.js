@@ -4,8 +4,12 @@ import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/20/solid";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,7 +51,7 @@ export default function Navi() {
                 alt="ポケモンボール"
                 width={32}
                 height={32}
-                className="h-8 w-auto"
+                className="outlin-black/5 size-8 rounded-full bg-gray-100 outline -outline-offset-1"
               />
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -60,7 +64,73 @@ export default function Navi() {
               <Link href={"/posts/1"} className={getNavLinkClasses("/posts/1")}>
                 Posts
               </Link>
+              <Link
+                href={"/practice"}
+                className={getNavLinkClasses("/practice")}
+              >
+                Practice
+              </Link>
             </div>
+          </div>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <button
+              type="button"
+              className="relative rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600"
+            >
+              <span className="absolute -inset-1.5"></span>
+              <BellIcon aria-hidden="true" className="size-6" />
+            </button>
+
+            <Menu as="div" className="relative ml-3">
+              <MenuButton className="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                <span className="absolute -inset-1.5" />
+                <Image
+                  src="/globe.svg"
+                  alt="地球儀"
+                  width={32}
+                  height={32}
+                  className="size-8 rounded-full bg-gray-100 outline -outline-offset-1 outline-black/5"
+                />
+              </MenuButton>
+
+              <MenuItems
+                transition
+                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg outline outline-black/5 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+              >
+                <MenuItem>
+                  <Link
+                    href="#"
+                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  >
+                    ポケモンの詳細
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link
+                    href="#"
+                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  >
+                    ポケモンの詳細
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link
+                    href="#"
+                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  >
+                    ポケモンの詳細
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link
+                    href="#"
+                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  >
+                    ポケモンの詳細
+                  </Link>
+                </MenuItem>
+              </MenuItems>
+            </Menu>
           </div>
         </div>
       </div>
