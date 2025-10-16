@@ -61,7 +61,7 @@ export default function Navi() {
               <Link href={"/pokemon"} className={getNavLinkClasses("/pokemon")}>
                 Pokemon
               </Link>
-              <Link href={"/posts/1"} className={getNavLinkClasses("/posts/1")}>
+              <Link href={"/posts"} className={getNavLinkClasses("/posts/1")}>
                 Posts
               </Link>
               <Link

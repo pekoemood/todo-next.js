@@ -1,12 +1,15 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon, DivideIcon } from "@heroicons/react/20/solid";
 
-import { ExclamationCircleIcon } from '@heroicons/react/16/solid'
+import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
 
 export default function Example() {
   return (
-    <div className="w-96 m-10">
-      <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+    <div className="m-10 w-96">
+      <label
+        htmlFor="email"
+        className="block text-sm/6 font-medium text-gray-900"
+      >
         Email
       </label>
       <div className="mt-2 grid grid-cols-1">
@@ -29,6 +32,5 @@ export default function Example() {
         Not a valid email address.
       </p>
     </div>
-  )
+  );
 }
-
