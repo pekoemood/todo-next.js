@@ -1,18 +1,45 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon, DivideIcon } from "@heroicons/react/20/solid";
+import { User, UsersApiResponse } from "../api/hello/route";
 
-import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
+export default async function Example() {
+  const baseUrl = process.env.BASE_URL;
 
-export default function Example() {
-  return (
-    <div className="mx-auto mt-10 flex max-w-7xl items-center px-8">
-      <div className="w-full border-t border-gray-900"></div>
-      <div className="relative flex justify-center">
-        <span className="bg-white px-3 text-base font-semibold text-gray-900">
-          Project
-        </span>
+  try {
+    const response = await fetch(`${baseUrl}/api/hello`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const apiResponse: UsersApiResponse = await response.json();
+
+    if (apiResponse.status === "error") {
+      throw new Error(apiResponse.message || "API Error");
+    }
+
+    const users = apiResponse.data;
+
+    return (
+      <div className="mx-auto max-w-7xl px-8 py-8">
+        <h1 className="text-4xl font-bold">Email List</h1>
+        <div className="mt-10 items-center space-y-2 divide-y divide-gray-200">
+          {users.map((user) => (
+            <div key={user.id} className="rounded-lg py-4">
+              <p className="text-2xl font-bold">{user.name}</p>
+              <p>{user.email}</p>
+              <p>{user.address.city}</p>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="w-full border-t border-gray-300"></div>
-    </div>
-  );
+    );
+  } catch (error) {
+    return (
+      <div className="mx-auto mt-10 max-w-7xl px-8">
+        <div className="text-red-500">
+          <h1 className="text-xl font-bold">Error</h1>
+          <p>{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 }

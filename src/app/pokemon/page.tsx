@@ -14,13 +14,13 @@ type Pokemon = {
 };
 
 export default async function Pokemon() {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon`);
-  const pokemons: Pokemons = await res.json();
+  const pokemons: Pokemons = await fetch(
+    `https://pokeapi.co/api/v2/pokemon`,
+  ).then((res) => res.json());
 
   const detailPokemons: Pokemon[] = await Promise.all(
     pokemons.results.map(async (p) => {
-      const res = await fetch(p.url);
-      const data = await res.json();
+      const data = await fetch(p.url).then((res) => res.json());
       return data;
     }),
   );
@@ -32,20 +32,26 @@ export default async function Pokemon() {
       </h2>
       <ul
         role="list"
-        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+        className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
       >
         {detailPokemons.map((pokemon) => (
           <li key={pokemon.id}>
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600">
+            <div
+              tabIndex={0}
+              className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-lg focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500"
+            >
+              <div className="px-4 py-5 sm:px-6">
+                <p className="text-center text-xl font-semibold text-gray-500">
+                  {pokemon.name}
+                </p>
+              </div>
               <Image
                 src={pokemon.sprites.other["official-artwork"].front_default}
                 alt="ポケモン画像"
                 width={500}
                 height={500}
-                className=" pointer-events-none rounded-lg object-cover outline -outline-offset-1 outline-black/5 group-hover:opacity-75"
               />
             </div>
-            <p className="font-semibold ">{pokemon.name}</p>
           </li>
         ))}
       </ul>
