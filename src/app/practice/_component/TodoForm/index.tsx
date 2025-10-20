@@ -1,56 +1,78 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { addTodo } from "../../_actions/todo-actions";
+import { useActionState, useEffect, useState, useTransition } from "react";
+import { addTodo, newAddTodo } from "../../_actions/todo-actions";
+import { Todo } from "@/generated/prisma";
+
+export interface ActionState {
+  success: boolean;
+  error?: string;
+  todo?: Todo;
+}
 
 export default function TodoForm() {
-  const [todo, setTodo] = useState<string>();
-  const [message, setMessage] = useState<{
-    type: "succee" | "error";
-    text: string;
-  } | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(newAddTodo, {
+    success: false,
+    error: undefined,
+    todo: undefined,
+  });
 
-  const handleSubmit = async (formData: FormData) => {
-    startTransition(async () => {
-      const result = await addTodo(formData);
+  const [showMessage, setShowMessage] = useState(true);
 
-      if (result.success) {
-        setMessage({ type: "succee", text: "タスクを追加しました" });
-        setTodo("");
-      } else {
-        setMessage({
-          type: "error",
-          text: result.error || "エラーが発生しました",
-        });
-      }
-    });
-  };
+  useEffect(() => {
+    if (state.success || state.error) {
+      setShowMessage(true);
+
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state.success, state.error]);
 
   return (
-    <form className="mt-6" action={handleSubmit}>
-      <div className="max-w-2xl">
-        <label
-          htmlFor="todo"
-          className="block text-sm/6 font-medium text-gray-900"
+    <div>
+      <form className="mt-6" action={formAction}>
+        <div className="max-w-2xl">
+          <label
+            htmlFor="todo"
+            className="block text-sm/6 font-medium text-gray-900"
+          >
+            タスク
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              id="todo"
+              name="todo"
+              type="text"
+              placeholder="今日のやるべきことを入力しよう！"
+              className="out-line-gray-300 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 disabled:opacity-50 sm:text-sm/6"
+              disabled={isPending}
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 font-semibold text-white"
+            >
+              {isPending ? "追加中..." : "追加"}
+            </button>
+          </div>
+        </div>
+      </form>
+      {state.success && showMessage && (
+        <div className="mt-4 rounded-md border border-green-200 bg-green-50 p-4 text-green-800">
+          {state.todo?.name}を追加しました
+        </div>
+      )}
+
+      {state.error && showMessage && (
+        <div
+          id="todo-error"
+          className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-800"
         >
-          タスク
-        </label>
-        <input
-          id="todo"
-          name="todo"
-          type="text"
-          onChange={(e) => setTodo(e.target.value)}
-          placeholder="今日のやるべきことを入力しよう！"
-          className="out-line-gray-300 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-        />
-        <button
-          type="submit"
-          className="mt-2 rounded-lg bg-indigo-600 px-5 py-1.5 font-semibold text-white"
-        >
-          追加
-        </button>
-      </div>
-    </form>
+          {state.error}
+        </div>
+      )}
+    </div>
   );
 }
