@@ -54,3 +54,23 @@ export async function newAddTodo(
     return { success: false, error: "タスクの作成に失敗しました" };
   }
 }
+
+export async function deleteTodo(todoId: number): Promise<void> {
+  try {
+    await prisma.todo.delete({
+      where: {
+        id: todoId,
+      },
+    });
+    revalidatePath("/practice");
+  } catch (error) {
+    console.error("Todo削除エラー:", error);
+
+    if (error instanceof Error) {
+      if (error.message.includes("Record to delete does not exist")) {
+        throw new Error("該当するタスクが見つかりません");
+      }
+    }
+    throw new Error("削除に失敗しました");
+  }
+}
