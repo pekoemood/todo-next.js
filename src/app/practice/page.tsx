@@ -1,5 +1,6 @@
 import { TodoResponse } from "../api/todos/route";
 import TodoForm from "./_component/TodoForm";
+import TodoItem from "./_component/TodoItem";
 
 export default async function Example() {
   const baseUrl = process.env.BASE_URL;
@@ -13,20 +14,7 @@ export default async function Example() {
       <TodoForm />
       <ul className="mt-6">
         {todos.map((todo) => (
-          <li
-            key={todo.id}
-            className="flex items-center justify-between space-y-8"
-          >
-            <p>{todo.name}</p>
-            <div className="flex items-center gap-4">
-              <button className="rounded-lg bg-indigo-400 px-3 py-1.5 font-semibold text-white hover:bg-indigo-600">
-                編集
-              </button>
-              <button className="rounded-lg bg-red-400 px-3 py-1.5 font-semibold text-white hover:bg-red-600">
-                削除
-              </button>
-            </div>
-          </li>
+          <TodoItem key={todo.id} todo={todo} />
         ))}
       </ul>
     </div>
