@@ -12,7 +12,11 @@ export default function TodoItem({ todo }: { todo: Todo }) {
 
     if (confirmed) {
       startTransition(async () => {
-        await deleteTodo(todoId);
+        try {
+          await deleteTodo(todoId);
+        } catch (error) {
+          alert("削除に失敗しました");
+        }
       });
     }
   };

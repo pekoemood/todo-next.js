@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import { addTodo, newAddTodo } from "../../_actions/todo-actions";
+import { newAddTodo } from "../../_actions/todo-actions";
 import { Todo } from "@/generated/prisma";
 
 export interface ActionState {
