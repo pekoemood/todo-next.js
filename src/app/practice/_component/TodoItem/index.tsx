@@ -1,11 +1,14 @@
 "use client";
 
 import { Todo } from "@/generated/prisma";
-import { useTransition } from "react";
-import { deleteTodo } from "../../_actions/todo-actions";
+import { useOptimistic, useState, useTransition } from "react";
+import { deleteTodo, updateTodo } from "../../_actions/todo-actions";
 
 export default function TodoItem({ todo }: { todo: Todo }) {
   const [isPending, startTransition] = useTransition();
+  const [editMode, setEditMode] = useState(false);
+  const [text, setText] = useState("");
+  const [isTime, Transition] = useTransition();
 
   const handleClickDelete = (todoId: number) => {
     const confirmed = confirm(`${todo.name}を削除しますか？`);
@@ -21,13 +24,44 @@ export default function TodoItem({ todo }: { todo: Todo }) {
     }
   };
 
+  const handleClickUpdate = (id: number, name: string) => {
+    Transition(async () => {
+      await updateTodo(id, name);
+    });
+  };
+
   return (
     <li className="flex items-center justify-between space-y-8">
-      <p>{todo.name}</p>
+      {editMode ? (
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={todo.name}
+          className="rounded-md border border-gray-200 px-2"
+        />
+      ) : (
+        <p>{todo.name}</p>
+      )}
       <div className="flex items-center gap-4">
-        <button className="rounded-lg bg-indigo-400 px-3 py-1.5 font-semibold text-white hover:bg-indigo-600">
-          編集
-        </button>
+        {editMode ? (
+          <button
+            className="rounded-lg bg-indigo-400 px-3 py-1.5 font-semibold text-white hover:bg-indigo-600"
+            onClick={() => {
+              handleClickUpdate(todo.id, text);
+              setEditMode(!editMode);
+            }}
+          >
+            保存
+          </button>
+        ) : (
+          <button
+            className="rounded-lg bg-indigo-400 px-3 py-1.5 font-semibold text-white hover:bg-indigo-600"
+            onClick={() => setEditMode(!editMode)}
+          >
+            編集
+          </button>
+        )}
         <button
           onClick={() => handleClickDelete(todo.id)}
           className="rounded-lg bg-red-400 px-3 py-1.5 font-semibold text-white hover:bg-red-600 disabled:opacity-50"

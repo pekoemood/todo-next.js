@@ -74,3 +74,23 @@ export async function deleteTodo(todoId: number): Promise<void> {
     throw new Error("削除に失敗しました");
   }
 }
+
+export async function updateTodo(
+  todoId: number,
+  todoName: string,
+): Promise<void> {
+  try {
+    await prisma.todo.update({
+      where: {
+        id: todoId,
+      },
+      data: {
+        name: todoName,
+      },
+    });
+    revalidatePath("/practice");
+  } catch (error) {
+    console.error("Todo更新エラー", error);
+    throw new Error("更新に失敗しました");
+  }
+}
