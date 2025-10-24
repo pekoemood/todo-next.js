@@ -7,8 +7,15 @@ import { deleteTodo, updateTodo } from "../../_actions/todo-actions";
 export default function TodoItem({ todo }: { todo: Todo }) {
   const [isPending, startTransition] = useTransition();
   const [editMode, setEditMode] = useState(false);
-  const [text, setText] = useState("");
+  const [text, setText] = useState(todo.name);
   const [isTime, Transition] = useTransition();
+  const [optimistic, addOptimistic] = useOptimistic(
+    todo,
+    (currentTodo, newName: string) => ({
+      ...currentTodo,
+      name: newName,
+    }),
+  );
 
   const handleClickDelete = (todoId: number) => {
     const confirmed = confirm(`${todo.name}を削除しますか？`);
@@ -26,8 +33,10 @@ export default function TodoItem({ todo }: { todo: Todo }) {
 
   const handleClickUpdate = (id: number, name: string) => {
     Transition(async () => {
+      addOptimistic(name);
       await updateTodo(id, name);
     });
+    setEditMode(false);
   };
 
   return (
@@ -41,16 +50,13 @@ export default function TodoItem({ todo }: { todo: Todo }) {
           className="rounded-md border border-gray-200 px-2"
         />
       ) : (
-        <p>{todo.name}</p>
+        <p>{optimistic.name}</p>
       )}
       <div className="flex items-center gap-4">
         {editMode ? (
           <button
             className="rounded-lg bg-indigo-400 px-3 py-1.5 font-semibold text-white hover:bg-indigo-600"
-            onClick={() => {
-              handleClickUpdate(todo.id, text);
-              setEditMode(!editMode);
-            }}
+            onClick={() => handleClickUpdate(todo.id, text)}
           >
             保存
           </button>
