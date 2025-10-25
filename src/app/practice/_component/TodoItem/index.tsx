@@ -39,6 +39,20 @@ export default function TodoItem({ todo }: { todo: Todo }) {
     setEditMode(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
+
+    if (e.key === "Enter") {
+      handleClickUpdate(optimistic.id, text);
+    }
+    if (e.key === "Escape") {
+      setText(todo.name);
+      setEditMode(false);
+    }
+  };
+
   return (
     <li className="flex items-center justify-between space-y-8">
       {editMode ? (
@@ -48,6 +62,8 @@ export default function TodoItem({ todo }: { todo: Todo }) {
           onChange={(e) => setText(e.target.value)}
           placeholder={todo.name}
           className="rounded-md border border-gray-200 px-2"
+          onKeyDown={handleKeyDown}
+          autoFocus
         />
       ) : (
         <p>{optimistic.name}</p>
