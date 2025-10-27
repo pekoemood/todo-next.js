@@ -21,6 +21,10 @@ model User {
   posts    Post[]
 }
 
+model Session {
+  id String @id @default(autoincrement())
+}
+
 model Post {
   id        Int      @id @default(autoincrement())
   createAt  DateTime @default(now())
