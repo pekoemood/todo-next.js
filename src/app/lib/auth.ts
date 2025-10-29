@@ -28,7 +28,7 @@ async function hashSecret(secret: string): Promise<Uint8Array> {
   return new Uint8Array(secretHashBuffer);
 }
 
-async function createSession(dbPool: any): Promise<SessionWithToken> {
+async function createSession(): Promise<SessionWithToken> {
   const now = new Date();
 
   const id = generateSecureRandomString();
@@ -48,7 +48,12 @@ async function createSession(dbPool: any): Promise<SessionWithToken> {
     data: {
       id: session.id,
       secretHash: session.secretHash,
-      createdAt: session.createdAt, 
+      createdAt: session.createdAt,
     },
   });
+
+  return session;
 }
+
+const sessionExpiresInSeconds = 60 * 60 * 24;
+
