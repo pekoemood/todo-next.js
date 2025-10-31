@@ -57,3 +57,33 @@ async function createSession(): Promise<SessionWithToken> {
 
 const sessionExpiresInSeconds = 60 * 60 * 24;
 
+async function validateSessionToken(token: stirng): Promise<Session | null> {
+  const tokenParts = token.split(".");
+  if (tokenParts.length !== 2) {
+    return null;
+  }
+  const sessionId = tokenParts[0];
+  const seessionSecret = tokenParts[1];
+}
+
+async function getSession(sessionId: string): Promise<Session | null> {
+  const now = new Date();
+
+  const session = await prisma.session.findUnique({
+    where: {
+      id: sessionId,
+    },
+  });
+
+  if (session === null) {
+    return null;
+  };
+
+  if(now.getTime() - session.createdAt.getTime() >= sessionExpiresInSeconds * 1000) {
+    await deleteSession(sessionId);
+    return null;
+  }
+  return session;
+}
+
+
