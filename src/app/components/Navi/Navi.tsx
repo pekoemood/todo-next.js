@@ -70,6 +70,9 @@ export default function Navi() {
               >
                 Practice
               </Link>
+              <Link href={"/signup"} className={getNavLinkClasses("/signup")}>
+                Signup
+              </Link>
               <Link href={"/login"} className={getNavLinkClasses("/login")}>
                 Login
               </Link>

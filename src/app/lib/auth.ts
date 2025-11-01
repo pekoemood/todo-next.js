@@ -63,7 +63,14 @@ async function validateSessionToken(token: stirng): Promise<Session | null> {
     return null;
   }
   const sessionId = tokenParts[0];
-  const seessionSecret = tokenParts[1];
+  const sessionSecret = tokenParts[1];
+
+  const session = await getSession(sessionId);
+  if (!session) return null;
+
+  const tokenSecretHash = await hashSecret(sessionSecret);
+  const validSecret = constantTimeEqual(tokenSecretHash, session.secretHash);
+  if (!validSecret) return null;
 }
 
 async function getSession(sessionId: string): Promise<Session | null> {
@@ -77,13 +84,52 @@ async function getSession(sessionId: string): Promise<Session | null> {
 
   if (session === null) {
     return null;
-  };
+  }
 
-  if(now.getTime() - session.createdAt.getTime() >= sessionExpiresInSeconds * 1000) {
+  if (
+    now.getTime() - session.createdAt.getTime() >=
+    sessionExpiresInSeconds * 1000
+  ) {
     await deleteSession(sessionId);
     return null;
   }
   return session;
 }
 
+async function deleteSession(sessionId: string): Promise<void> {
+  await prisma.session.delete({
+    where: {
+      id: sessionId,
+    },
+  });
+}
 
+function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.byteLength !== b.byteLength) {
+    return false;
+  }
+  let c = 0;
+  for (let i = 0; i < a.byteLength; i++) {
+    c |= a[i] ^ b[i];
+  }
+  return c === 0;
+}
+
+function endcodeSessionPublicJSON(session: Session): string {
+  const json = JSON.stringify({
+    id: session.id,
+    createdAt: Math.floor(session.createdAt.getTime() / 1000),
+  });
+  return json;
+}
+
+function verifyRequestOrigin(method: string, originHeader: string): boolean {
+  if (process.env.NODE_ENV !== "production") {
+    return true;
+  }
+
+  if (method === "GET" || method === "HEAD") {
+    return true;
+  }
+  return originHeader === "example.com";
+}
