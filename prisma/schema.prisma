@@ -15,16 +15,20 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   name     String
   password String
+  email    String    @unique
   posts    Post[]
+  sessions Session[]
 }
 
 model Session {
   id         String   @id
   secretHash Bytes
   createdAt  DateTime @default(now())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
