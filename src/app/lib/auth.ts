@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { prisma } from "../../../prisma/client";
 
 interface Session {
@@ -28,7 +29,7 @@ async function hashSecret(secret: string): Promise<Uint8Array> {
   return new Uint8Array(secretHashBuffer);
 }
 
-async function createSession(): Promise<SessionWithToken> {
+export async function createSession(userId: number): Promise<SessionWithToken> {
   const now = new Date();
 
   const id = generateSecureRandomString();
@@ -49,6 +50,7 @@ async function createSession(): Promise<SessionWithToken> {
       id: session.id,
       secretHash: session.secretHash,
       createdAt: session.createdAt,
+      userId,
     },
   });
 
@@ -57,7 +59,9 @@ async function createSession(): Promise<SessionWithToken> {
 
 const sessionExpiresInSeconds = 60 * 60 * 24;
 
-async function validateSessionToken(token: stirng): Promise<Session | null> {
+export async function validateSessionToken(
+  token: string,
+): Promise<Session | null> {
   const tokenParts = token.split(".");
   if (tokenParts.length !== 2) {
     return null;
@@ -71,6 +75,8 @@ async function validateSessionToken(token: stirng): Promise<Session | null> {
   const tokenSecretHash = await hashSecret(sessionSecret);
   const validSecret = constantTimeEqual(tokenSecretHash, session.secretHash);
   if (!validSecret) return null;
+
+  return session;
 }
 
 async function getSession(sessionId: string): Promise<Session | null> {
@@ -96,7 +102,7 @@ async function getSession(sessionId: string): Promise<Session | null> {
   return session;
 }
 
-async function deleteSession(sessionId: string): Promise<void> {
+export async function deleteSession(sessionId: string): Promise<void> {
   await prisma.session.delete({
     where: {
       id: sessionId,
@@ -132,4 +138,14 @@ function verifyRequestOrigin(method: string, originHeader: string): boolean {
     return true;
   }
   return originHeader === "example.com";
+}
+
+export async function verifySession() {
+  const sessionToken = (await cookies()).get("sessionToken")?.value;
+  if (!sessionToken) return null;
+
+  const session = await validateSessionToken(sessionToken);
+  if (!session) return null;
+
+  return session;
 }

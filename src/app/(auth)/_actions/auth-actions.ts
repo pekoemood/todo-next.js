@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "../../../../prisma/client";
 import * as z from "zod";
 import bcrypt from "bcryptjs";
+import {
+  createSession,
+  deleteSession,
+  validateSessionToken,
+} from "@/app/lib/auth";
+import { cookies } from "next/headers";
 
 const User = z.object({
   name: z.string().min(1, "名前は必須です").max(50, "名前は50文字以内"),
@@ -17,33 +23,63 @@ const User = z.object({
     .regex(/[0-9]/, "数字を含めてください"),
 });
 
-type UserSchema = z.infer<typeof User>;
+export type ActionResult = {
+  success: boolean;
+  fieldErrors?: Record<string, string[]>;
+  message?: string;
+};
 
-export async function signin(prevState: UserSchema, formData: FormData) {
+export async function signin(
+  prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const formObject = Object.fromEntries(formData);
   const result = User.safeParse(formObject);
   if (!result.success) {
-    return { error: result.error };
+    const fieldErrors = z.flattenError(result.error).fieldErrors;
+    return { success: false, fieldErrors: fieldErrors };
   }
 
   const exists = await prisma.user.findUnique({
     where: { email: result.data.email },
   });
   if (exists) {
-    return { error: { email: "このメールアドレスは既に登録されています" } };
+    return {
+      success: false,
+      fieldErrors: { email: ["このメールアドレスは既に登録されています"] },
+    };
   }
 
   try {
     const hashedPassword = await bcrypt.hash(result.data.password, 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name: result.data.name,
         email: result.data.email,
         password: hashedPassword,
       },
     });
+
+    const session = await createSession(user.id);
+    const cookieStore = await cookies();
+    cookieStore.set("sessionToken", session.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24,
+    });
   } catch (error) {
-    return { error: "登録に失敗しました" };
+    return { success: false, message: "登録に失敗しました" };
   }
+  redirect("/");
+}
+
+export async function logout() {
+  const sessionToken = (await cookies()).get("sessionToken")?.value;
+  if (!sessionToken) return null;
+  const session = await validateSessionToken(sessionToken);
+  if (!session) return null;
+  await deleteSession(session.id);
+  (await cookies()).delete("sessionToken");
   redirect("/");
 }

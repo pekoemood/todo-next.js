@@ -1,5 +1,8 @@
 import { DivideIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
+import { verifySession } from "../lib/auth";
+import { redirect } from "next/navigation";
+
 
 type Pokemons = {
   next: string | null;
@@ -24,6 +27,10 @@ export default async function Pokemon() {
       return data;
     }),
   );
+
+  const session = await verifySession();
+
+  if (!session) redirect("/login");
 
   return (
     <div className="mx-auto my-16 max-w-7xl px-8">
