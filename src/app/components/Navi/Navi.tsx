@@ -1,5 +1,6 @@
 "use client";
 
+import { logout } from "@/app/(auth)/_actions/auth-actions";
 import {
   Disclosure,
   DisclosureButton,
@@ -14,9 +15,11 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTransition } from "react";
 
 export default function Navi() {
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const getNavLinkClasses = (path: string) => {
     const isActive = path === pathname;
@@ -24,6 +27,12 @@ export default function Navi() {
       "border-indigo-600 px-1 pt-1 text-sm font-medium text-gray-900": isActive,
       "border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700":
         !isActive,
+    });
+  };
+
+  const handleClickLogout = () => {
+    startTransition(async () => {
+      await logout();
     });
   };
 
@@ -76,6 +85,12 @@ export default function Navi() {
               <Link href={"/login"} className={getNavLinkClasses("/login")}>
                 Login
               </Link>
+              <button
+                onClick={handleClickLogout}
+                className={getNavLinkClasses("/logout")}
+              >
+                Logout
+              </button>
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

@@ -5,7 +5,9 @@ import { useActionState, useState } from "react";
 import { signin } from "../_actions/auth-actions";
 
 export default function SignUp() {
-  const [state, formAction, isPending] = useActionState(signin, {});
+  const [state, formAction, isPending] = useActionState(signin, {
+    success: false,
+  });
   return (
     <div className="flex min-h-full flex-col justify-center px-8 py-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -33,6 +35,11 @@ export default function SignUp() {
                   placeholder="test"
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
+                {state?.fieldErrors?.name && (
+                  <p className="text-sm text-red-500">
+                    {state.fieldErrors.name}
+                  </p>
+                )}
               </div>
             </div>
             <div>
@@ -51,6 +58,11 @@ export default function SignUp() {
                   placeholder="test@example.com"
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
+                {state?.fieldErrors?.email && (
+                  <p className="text-sm text-red-500">
+                    {state.fieldErrors.email}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -70,6 +82,12 @@ export default function SignUp() {
                   placeholder="password"
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
+                {state?.fieldErrors?.password &&
+                  state.fieldErrors.password.map((error) => (
+                    <p key={error} className="text-sm text-red-500">
+                      {error}
+                    </p>
+                  ))}
               </div>
             </div>
 
