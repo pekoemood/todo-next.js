@@ -3,7 +3,6 @@ import Image from "next/image";
 import { verifySession } from "../lib/auth";
 import { redirect } from "next/navigation";
 
-
 type Pokemons = {
   next: string | null;
   previous: string | null;
