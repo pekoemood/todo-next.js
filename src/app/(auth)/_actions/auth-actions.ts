@@ -10,6 +10,8 @@ import {
   validateSessionToken,
 } from "@/app/lib/auth";
 import { cookies } from "next/headers";
+import { error } from "console";
+import { fi } from "zod/locales";
 
 const User = z.object({
   name: z.string().min(1, "名前は必須です").max(50, "名前は50文字以内"),
@@ -21,6 +23,11 @@ const User = z.object({
     .regex(/[A-Z]/, "英大文字を含めてください")
     .regex(/[a-z]/, "英小文字を含めてください")
     .regex(/[0-9]/, "数字を含めてください"),
+});
+
+const LoginUser = z.object({
+  email: z.email("有効なメールアドレスを入力してください"),
+  password: z.string().min(1, "パスワードを入力してください"),
 });
 
 export type ActionResult = {
@@ -82,4 +89,46 @@ export async function logout() {
   await deleteSession(session.id);
   (await cookies()).delete("sessionToken");
   redirect("/");
+}
+
+export async function login(
+  prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult | undefined> {
+  const formObject = Object.fromEntries(formData);
+  const result = LoginUser.safeParse(formObject);
+  if (!result.success) {
+    const fieldErrors = z.flattenError(result.error).fieldErrors;
+    return { success: false, fieldErrors: fieldErrors };
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: result.data.email,
+      },
+      select: {
+        id: true,
+        password: true,
+      },
+    });
+
+    if (!user) return { success: false, message: "ログインに失敗しました" };
+
+    const isMatch = await bcrypt.compare(result.data.password, user.password);
+
+    if (!isMatch) return { success: false, message: "ログインに失敗しました" };
+
+    const session = await createSession(user.id);
+    const cookieStore = await cookies();
+    cookieStore.set("sessionToken", session.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24,
+    });
+    redirect("/pokemon");
+  } catch (error) {
+    return { success: false, message: "ログインに失敗しました" };
+  }
 }
