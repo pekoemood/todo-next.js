@@ -94,7 +94,7 @@ export async function logout() {
 export async function login(
   prevState: ActionResult,
   formData: FormData,
-): Promise<ActionResult | undefined> {
+): Promise<ActionResult> {
   const formObject = Object.fromEntries(formData);
   const result = LoginUser.safeParse(formObject);
   if (!result.success) {
@@ -127,8 +127,8 @@ export async function login(
       sameSite: "lax",
       maxAge: 60 * 60 * 24,
     });
-    redirect("/pokemon");
   } catch (error) {
     return { success: false, message: "ログインに失敗しました" };
   }
+  redirect("/pokemon");
 }
