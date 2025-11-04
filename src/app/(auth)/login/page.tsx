@@ -1,6 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { useActionState } from "react";
+import { login } from "../_actions/auth-actions";
 
 export default function Login() {
+  const [state, formAction, isPending] = useActionState(login, {
+    success: false,
+  });
+
   return (
     <div className="flex min-h-full flex-col justify-center px-8 py-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -11,7 +19,7 @@ export default function Login() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
         <div className="bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
-          <form action="#" className="space-y-6">
+          <form action={formAction} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
