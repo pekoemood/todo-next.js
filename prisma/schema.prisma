@@ -24,11 +24,12 @@ model User {
 }
 
 model Session {
-  id         String   @id
-  secretHash Bytes
-  createdAt  DateTime @default(now())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  id             String   @id
+  secretHash     Bytes
+  createdAt      DateTime @default(now())
+  lastVerifiedAt DateTime @default(now())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
